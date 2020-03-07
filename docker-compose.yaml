@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper # pulls the Zookeeper base image from Docker Hub
+    ports:
+      - "2181:2181"     # exposes port 2181 for zookeeper
+
+  kafka:
+    image: wurstmeister/kafka # pulls the Kafka base image from Docker Hub
+    ports:
+      - "9092:9092"   # exposes port 9092 for kafka
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost  # sets kafka to be available locally
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181  # sets kafka to talk to zookeeper on the appropriate port
+      KAFKA_CREATE_TOPICS: "apple:3:1"  # sets up our kafka topic for the Apple stock price data with 3 partitions and 1 replica
+    volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock  # this is a required volume, according to the Wurstmeister documentation
+    depends_on: 
+      - zookeeper # ensures that the Kafka cluster won't launch unless the Zookeeper container is successfully running
+
+      
